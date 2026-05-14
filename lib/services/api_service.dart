@@ -5,11 +5,9 @@ import '../models/product_model.dart';
 
 class ApiService {
 
-  // BASE URL API
   static const String baseUrl =
       'https://task.itprojects.web.id/api';
 
-  // LOGIN
   static Future<String?> login(
       String username,
       String password,
@@ -56,9 +54,6 @@ class ApiService {
     }
   }
 
-// =========================
-// GET PRODUCTS
-// =========================
 static Future<List<Product>> getProducts(
     String token,
     ) async {
@@ -83,7 +78,6 @@ static Future<List<Product>> getProducts(
 
       final data = jsonDecode(response.body);
 
-      // FIX FINAL
       List products = data['data']['products'];
 
       return products
@@ -104,9 +98,6 @@ static Future<List<Product>> getProducts(
   }
 }
 
-  // =========================
-  // ADD PRODUCT
-  // =========================
   static Future<bool> addProduct(
       String token,
       String name,
@@ -144,6 +135,51 @@ static Future<List<Product>> getProducts(
     } catch (e) {
 
       print("ERROR ADD PRODUCT:");
+      print(e);
+
+      return false;
+    }
+  }
+
+  static Future<bool> submitProduct(
+    String token,
+    String name,
+    String description,
+    int price,
+    String githubUrl,
+  ) async {
+
+    try {
+
+      final response = await http.post(
+
+        Uri.parse('$baseUrl/products/submit'),
+
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+
+        body: jsonEncode({
+
+          'name': name,
+          'description': description,
+          'price': price,
+          'github_url': githubUrl,
+        }),
+      );
+
+      print("========== SUBMIT PRODUCT ==========");
+      print(response.statusCode);
+      print(response.body);
+
+      return response.statusCode == 200 ||
+          response.statusCode == 201;
+
+    } catch (e) {
+
+      print("ERROR SUBMIT PRODUCT:");
       print(e);
 
       return false;
